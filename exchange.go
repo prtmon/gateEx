@@ -22,7 +22,7 @@ type ExConfig struct {
 }
 
 type Exchange struct {
-	Config    *ExConfig          //exchange config
+	Config    *ExConfig          `json:"config"` //exchange config
 	apiClient *gateapi.APIClient //api client
 	wsClient  *gatews.WsService  //websocket client
 	apiCtx    context.Context    //全局context
