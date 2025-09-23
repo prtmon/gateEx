@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-type ExchangeConfig struct {
+type ExConfig struct {
 	Name          string `json:"name"`           //交易所名称 name
 	ApiKey        string `json:"api_key"`        //交易所api key
 	ApiSecretKey  string `json:"api_secret_key"` //交易所secret key
@@ -22,27 +22,16 @@ type ExchangeConfig struct {
 }
 
 type Exchange struct {
-	Name          string             `json:"name"`           //交易所名称 name
-	ApiKey        string             `json:"api_key"`        //交易所api key
-	ApiSecretKey  string             `json:"api_secret_key"` //交易所secret key
-	ApiPassphrase string             `json:"api_passphrase"` //交易所API密码
-	ProxyUrl      string             `json:"proxy_url"`      //代理服务器地址
-	SettleCoin    string             `json:"settle_coin"`    //现货为计价币种,合约为结算币种
-	Leverage      int64              `json:"leverage"`       //杠杆倍数,部分交易所支持小数位的倍数系数
-	apiClient     *gateapi.APIClient //api client
-	wsClient      *gatews.WsService  //websocket client
-	apiCtx        context.Context    //全局context
-	Uid           string             `json:"uid"` //用户ID
+	Config    *ExConfig          //exchange config
+	apiClient *gateapi.APIClient //api client
+	wsClient  *gatews.WsService  //websocket client
+	apiCtx    context.Context    //全局context
+	Uid       string             `json:"uid"` //用户ID
 }
 
-func NewExchange(conf *ExchangeConfig) *Exchange {
+func NewExchange(conf *ExConfig) *Exchange {
 	ex := &Exchange{
-		Name:         conf.Name,
-		ApiKey:       conf.ApiKey,
-		ApiSecretKey: conf.ApiSecretKey,
-		SettleCoin:   conf.SettleCoin,
-		ProxyUrl:     conf.ProxyUrl,
-		Leverage:     conf.Leverage,
+		Config: conf,
 	}
 
 	accountDetail, err := ex.GetAccountDetail()
@@ -59,10 +48,10 @@ func (e *Exchange) ApiClient() *gateapi.APIClient {
 		cfg.HTTPClient = &http.Client{
 			Transport: &http.Transport{
 				Proxy: func(request *http.Request) (*url.URL, error) {
-					if e.ProxyUrl == "" {
+					if e.Config.ProxyUrl == "" {
 						return nil, nil
 					}
-					proxy, err := url.Parse(e.ProxyUrl)
+					proxy, err := url.Parse(e.Config.ProxyUrl)
 					if err != nil {
 						return nil, nil
 					}
@@ -80,8 +69,8 @@ func (e *Exchange) ApiClient() *gateapi.APIClient {
 func (e *Exchange) ApiCtx() context.Context {
 	if e.apiCtx == nil {
 		e.apiCtx = context.WithValue(context.Background(), gateapi.ContextGateAPIV4, gateapi.GateAPIV4{
-			Key:    e.ApiKey,
-			Secret: e.ApiSecretKey,
+			Key:    e.Config.ApiKey,
+			Secret: e.Config.ApiSecretKey,
 		})
 	}
 	return e.apiCtx
@@ -90,14 +79,14 @@ func (e *Exchange) ApiCtx() context.Context {
 func (e *Exchange) WsClient() *gatews.WsService {
 	if e.wsClient == nil {
 		wsUrl := gatews.FuturesUsdtUrl
-		if strings.ToUpper(e.SettleCoin) == "USD" || strings.ToUpper(e.SettleCoin) == "BTC" {
+		if strings.ToUpper(e.Config.SettleCoin) == "USD" || strings.ToUpper(e.Config.SettleCoin) == "BTC" {
 			wsUrl = gatews.FuturesBtcUrl
 		}
 		var err error
 		e.wsClient, err = gatews.NewWsService(nil, nil, gatews.NewConnConfFromOption(&gatews.ConfOptions{
 			URL:           wsUrl,
-			Key:           e.ApiKey,
-			Secret:        e.ApiSecretKey,
+			Key:           e.Config.ApiKey,
+			Secret:        e.Config.ApiSecretKey,
 			MaxRetryConn:  10, // default value is math.MaxInt64, set it when needs
 			SkipTlsVerify: false,
 		}))

@@ -13,13 +13,13 @@ ListFuturesAccounts Query futures account
 
 @return FuturesAccount
 */
-func (e *Exchange) ListFuturesAccounts(settle string) (out gateapi.FuturesAccount, err error) {
-	out, _, err = e.ApiClient().FuturesApi.ListFuturesAccounts(e.ApiCtx(), strings.ToLower(settle))
+func (e *Exchange) ListFuturesAccounts() (out gateapi.FuturesAccount, err error) {
+	out, _, err = e.ApiClient().FuturesApi.ListFuturesAccounts(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin))
 	return out, err
 }
 
-func (e *Exchange) ListFuturesContract(settle string) (out []gateapi.Contract, err error) {
-	out, _, err = e.ApiClient().FuturesApi.ListFuturesContracts(e.ApiCtx(), strings.ToLower(settle), nil)
+func (e *Exchange) ListFuturesContract() (out []gateapi.Contract, err error) {
+	out, _, err = e.ApiClient().FuturesApi.ListFuturesContracts(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), nil)
 	return out, err
 }
 
@@ -31,17 +31,17 @@ GetFuturesContract Get a single contract
 
 @return Contract
 */
-func (e *Exchange) GetFuturesContract(settle string, contract string) (out gateapi.Contract, err error) {
-	out, _, err = e.ApiClient().FuturesApi.GetFuturesContract(e.ApiCtx(), strings.ToLower(settle), contract)
+func (e *Exchange) GetFuturesContract(contract string) (out gateapi.Contract, err error) {
+	out, _, err = e.ApiClient().FuturesApi.GetFuturesContract(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), contract)
 	return out, err
 }
 
-func (e *Exchange) ListFuturesTickers(settle string, contract string) (out []gateapi.FuturesTicker, err error) {
+func (e *Exchange) ListFuturesTickers(contract string) (out []gateapi.FuturesTicker, err error) {
 	localVarOptionals := &gateapi.ListFuturesTickersOpts{}
 	if contract != "" {
 		localVarOptionals.Contract = optional.NewString(contract)
 	}
-	out, _, err = e.ApiClient().FuturesApi.ListFuturesTickers(e.ApiCtx(), strings.ToLower(settle), localVarOptionals)
+	out, _, err = e.ApiClient().FuturesApi.ListFuturesTickers(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), localVarOptionals)
 	return out, err
 }
 
@@ -59,7 +59,7 @@ Return specified contract candlesticks. If prefix &#x60;contract&#x60; with &#x6
 
 @return []FuturesCandlestick
 */
-func (e *Exchange) ListFuturesCandlesticks(settle string, contract string, from int64, to int64, limit int32, interval string) (out FuturesCandlesticks, err error) {
+func (e *Exchange) ListFuturesCandlesticks(contract string, from int64, to int64, limit int32, interval string) (out FuturesCandlesticks, err error) {
 	localVarOptionals := &gateapi.ListFuturesCandlesticksOpts{}
 
 	if from > 0 {
@@ -75,11 +75,11 @@ func (e *Exchange) ListFuturesCandlesticks(settle string, contract string, from 
 		localVarOptionals.Interval = optional.NewString(interval)
 	}
 
-	out, _, err = e.ApiClient().FuturesApi.ListFuturesCandlesticks(e.ApiCtx(), strings.ToLower(settle), contract, localVarOptionals)
+	out, _, err = e.ApiClient().FuturesApi.ListFuturesCandlesticks(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), contract, localVarOptionals)
 	return out, err
 }
 
-func (e *Exchange) ListFuturesOrderBook(settle string, contract string, limit int32, interval string) (out gateapi.FuturesOrderBook, err error) {
+func (e *Exchange) ListFuturesOrderBook(contract string, limit int32, interval string) (out gateapi.FuturesOrderBook, err error) {
 	localVarOptionals := &gateapi.ListFuturesOrderBookOpts{}
 
 	if limit > 0 {
@@ -88,43 +88,43 @@ func (e *Exchange) ListFuturesOrderBook(settle string, contract string, limit in
 	if interval != "" {
 		localVarOptionals.Interval = optional.NewString(interval)
 	}
-	out, _, err = e.ApiClient().FuturesApi.ListFuturesOrderBook(e.ApiCtx(), strings.ToLower(settle), contract, localVarOptionals)
+	out, _, err = e.ApiClient().FuturesApi.ListFuturesOrderBook(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), contract, localVarOptionals)
 	return out, err
 }
 
-func (e *Exchange) GetDualModePosition(settle string, contract string) (out []gateapi.Position, err error) {
-	out, _, err = e.ApiClient().FuturesApi.GetDualModePosition(e.ApiCtx(), strings.ToLower(settle), contract)
+func (e *Exchange) GetDualModePosition(contract string) (out []gateapi.Position, err error) {
+	out, _, err = e.ApiClient().FuturesApi.GetDualModePosition(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), contract)
 	return out, err
 }
 
-func (e *Exchange) GetPosition(settle string, contract string) (out gateapi.Position, err error) {
-	out, _, err = e.ApiClient().FuturesApi.GetPosition(e.ApiCtx(), strings.ToLower(settle), contract)
+func (e *Exchange) GetPosition(contract string) (out gateapi.Position, err error) {
+	out, _, err = e.ApiClient().FuturesApi.GetPosition(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), contract)
 	return out, err
 }
 
-func (e *Exchange) ListPositions(settle string, holding bool) (out []gateapi.Position, err error) {
+func (e *Exchange) ListPositions(holding bool) (out []gateapi.Position, err error) {
 	localVarOptionals := &gateapi.ListPositionsOpts{
 		Holding: optional.NewBool(holding),
 	}
-	out, _, err = e.ApiClient().FuturesApi.ListPositions(e.ApiCtx(), strings.ToLower(settle), localVarOptionals)
+	out, _, err = e.ApiClient().FuturesApi.ListPositions(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), localVarOptionals)
 	return out, err
 }
 
-func (e *Exchange) CancelFuturesOrders(settle string, contract string, side string) (out []gateapi.FuturesOrder, err error) {
+func (e *Exchange) CancelFuturesOrders(contract string, side string) (out []gateapi.FuturesOrder, err error) {
 	localVarOptionals := &gateapi.CancelFuturesOrdersOpts{}
 	if side != "" {
 		localVarOptionals.Side = optional.NewString(side)
 	}
-	out, _, err = e.ApiClient().FuturesApi.CancelFuturesOrders(e.ApiCtx(), strings.ToLower(settle), contract, localVarOptionals)
+	out, _, err = e.ApiClient().FuturesApi.CancelFuturesOrders(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), contract, localVarOptionals)
 	return out, err
 }
 
-func (e *Exchange) CreateFuturesOrder(settle string, futuresOrder gateapi.FuturesOrder) (out gateapi.FuturesOrder, err error) {
-	out, _, err = e.ApiClient().FuturesApi.CreateFuturesOrder(e.ApiCtx(), strings.ToLower(settle), futuresOrder, nil)
+func (e *Exchange) CreateFuturesOrder(futuresOrder gateapi.FuturesOrder) (out gateapi.FuturesOrder, err error) {
+	out, _, err = e.ApiClient().FuturesApi.CreateFuturesOrder(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), futuresOrder, nil)
 	return out, err
 }
 
-func (e *Exchange) ListFuturesOrders(settle string, contract string, status string, limit int32, offset int32, lastId string) (out []gateapi.FuturesOrder, err error) {
+func (e *Exchange) ListFuturesOrders(contract string, status string, limit int32, offset int32, lastId string) (out []gateapi.FuturesOrder, err error) {
 	localVarOptionals := &gateapi.ListFuturesOrdersOpts{}
 	if limit > 0 {
 		localVarOptionals.Limit = optional.NewInt32(limit)
@@ -138,32 +138,32 @@ func (e *Exchange) ListFuturesOrders(settle string, contract string, status stri
 	if contract != "" {
 		localVarOptionals.LastId = optional.NewString(contract)
 	}
-	out, _, err = e.ApiClient().FuturesApi.ListFuturesOrders(e.ApiCtx(), strings.ToLower(settle), status, localVarOptionals)
+	out, _, err = e.ApiClient().FuturesApi.ListFuturesOrders(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), status, localVarOptionals)
 	return out, err
 }
 
-func (e *Exchange) CancelFuturesOrder(settle string, orderId string) (out gateapi.FuturesOrder, err error) {
-	out, _, err = e.ApiClient().FuturesApi.CancelFuturesOrder(e.ApiCtx(), strings.ToLower(settle), orderId, nil)
+func (e *Exchange) CancelFuturesOrder(orderId string) (out gateapi.FuturesOrder, err error) {
+	out, _, err = e.ApiClient().FuturesApi.CancelFuturesOrder(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), orderId, nil)
 	return out, err
 }
 
-func (e *Exchange) UpdatePositionLeverage(settle, contract, leverage string, isCross bool) (out gateapi.Position, err error) {
+func (e *Exchange) UpdatePositionLeverage(contract, leverage string, isCross bool) (out gateapi.Position, err error) {
 	localVarOptionals := &gateapi.UpdatePositionLeverageOpts{}
 	if isCross {
 		localVarOptionals.CrossLeverageLimit = optional.NewString(leverage)
 		leverage = "0"
 	}
-	out, _, err = e.ApiClient().FuturesApi.UpdatePositionLeverage(e.ApiCtx(), strings.ToLower(settle), contract, leverage, localVarOptionals)
+	out, _, err = e.ApiClient().FuturesApi.UpdatePositionLeverage(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), contract, leverage, localVarOptionals)
 	return out, err
 }
 
-func (e *Exchange) SetDualMode(settle string, dualMode bool) (out gateapi.FuturesAccount, err error) {
-	out, _, err = e.ApiClient().FuturesApi.SetDualMode(e.ApiCtx(), strings.ToLower(settle), dualMode)
+func (e *Exchange) SetDualMode(dualMode bool) (out gateapi.FuturesAccount, err error) {
+	out, _, err = e.ApiClient().FuturesApi.SetDualMode(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), dualMode)
 	return out, err
 }
 
 // ListFuturesAccountBook 查询合约账户变更历史
-func (e *Exchange) ListFuturesAccountBook(settle, contract, type_ string, limit, offset int32, from, to int64) (out []gateapi.FuturesAccountBook, err error) {
+func (e *Exchange) ListFuturesAccountBook(contract, type_ string, limit, offset int32, from, to int64) (out []gateapi.FuturesAccountBook, err error) {
 	localVarOptionals := &gateapi.ListFuturesAccountBookOpts{}
 	if limit > 0 {
 		localVarOptionals.Limit = optional.NewInt32(limit)
@@ -183,7 +183,7 @@ func (e *Exchange) ListFuturesAccountBook(settle, contract, type_ string, limit,
 	if type_ != "" {
 		localVarOptionals.Type_ = optional.NewString(type_)
 	}
-	out, _, err = e.ApiClient().FuturesApi.ListFuturesAccountBook(e.ApiCtx(), strings.ToLower(settle), localVarOptionals)
+	out, _, err = e.ApiClient().FuturesApi.ListFuturesAccountBook(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), localVarOptionals)
 	return out, err
 }
 
@@ -200,7 +200,7 @@ ListPositionClose 查询平仓历史
 - @param "Side" (optional.String) -  Query side.  long or shot
 - @param "Pnl" (optional.String) -  Query profit or loss
 */
-func (e *Exchange) ListPositionClose(settle, contract string, limit, offset int32, from, to int64, side, pnl string) (out []gateapi.PositionClose, err error) {
+func (e *Exchange) ListPositionClose(contract string, limit, offset int32, from, to int64, side, pnl string) (out []gateapi.PositionClose, err error) {
 	localVarOptionals := &gateapi.ListPositionCloseOpts{}
 	if limit > 0 {
 		localVarOptionals.Limit = optional.NewInt32(limit)
@@ -223,7 +223,7 @@ func (e *Exchange) ListPositionClose(settle, contract string, limit, offset int3
 	if pnl != "" {
 		localVarOptionals.Pnl = optional.NewString(pnl)
 	}
-	out, _, err = e.ApiClient().FuturesApi.ListPositionClose(e.ApiCtx(), strings.ToLower(settle), localVarOptionals)
+	out, _, err = e.ApiClient().FuturesApi.ListPositionClose(e.ApiCtx(), strings.ToLower(e.Config.SettleCoin), localVarOptionals)
 	return out, err
 }
 
