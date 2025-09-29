@@ -1,0 +1,12 @@
+{
+  "name": "gate",
+  "api_key": "xxx",
+  "api_secret_key": "xxx",
+  "api_passphrase": "",
+  "proxy_url": "",
+  "futures": {
+    "settle": "usdt",
+    "leverage": 3
+  },
+  "uid": "14305818"
+}

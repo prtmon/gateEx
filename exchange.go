@@ -11,14 +11,19 @@ import (
 	"strings"
 )
 
+// FuturesConfig 合约配置信息
+type FuturesConfig struct {
+	Settle   string `json:"settle"`   //现货为计价币种,合约为结算币种
+	Leverage int64  `json:"leverage"` //杠杆倍数,部分交易所支持小数位的倍数系数
+}
+
 type ExConfig struct {
-	Name          string `json:"name"`           //交易所名称 name
-	ApiKey        string `json:"api_key"`        //交易所api key
-	ApiSecretKey  string `json:"api_secret_key"` //交易所secret key
-	ApiPassphrase string `json:"api_passphrase"` //交易所API密码
-	ProxyUrl      string `json:"proxy_url"`      //代理服务器地址
-	SettleCoin    string `json:"settle_coin"`    //现货为计价币种,合约为结算币种
-	Leverage      int64  `json:"leverage"`       //杠杆倍数,部分交易所支持小数位的倍数系数
+	Name          string         `json:"name"`           //交易所名称 name
+	ApiKey        string         `json:"api_key"`        //交易所api key
+	ApiSecretKey  string         `json:"api_secret_key"` //交易所secret key
+	ApiPassphrase string         `json:"api_passphrase"` //交易所API密码
+	ProxyUrl      string         `json:"proxy_url"`      //代理服务器地址
+	Futures       *FuturesConfig `json:"futures"`        //合约配置信息
 }
 
 type Exchange struct {
@@ -76,15 +81,32 @@ func (e *Exchange) ApiCtx() context.Context {
 	return e.apiCtx
 }
 
-func (e *Exchange) WsClient() *gatews.WsService {
+func (e *Exchange) WsFuturesClient() *gatews.WsService {
 	if e.wsClient == nil {
 		wsUrl := gatews.FuturesUsdtUrl
-		if strings.ToUpper(e.Config.SettleCoin) == "USD" || strings.ToUpper(e.Config.SettleCoin) == "BTC" {
+		if strings.ToUpper(e.Config.Futures.Settle) == "USD" || strings.ToUpper(e.Config.Futures.Settle) == "BTC" {
 			wsUrl = gatews.FuturesBtcUrl
 		}
 		var err error
 		e.wsClient, err = gatews.NewWsService(nil, nil, gatews.NewConnConfFromOption(&gatews.ConfOptions{
 			URL:           wsUrl,
+			Key:           e.Config.ApiKey,
+			Secret:        e.Config.ApiSecretKey,
+			MaxRetryConn:  10, // default value is math.MaxInt64, set it when needs
+			SkipTlsVerify: false,
+		}))
+		if err != nil {
+			fmt.Printf("Init websocket client fail,error:%+v", err)
+		}
+	}
+	return e.wsClient
+}
+
+func (e *Exchange) WsSpotClient() *gatews.WsService {
+	if e.wsClient == nil {
+		var err error
+		e.wsClient, err = gatews.NewWsService(nil, nil, gatews.NewConnConfFromOption(&gatews.ConfOptions{
+			URL:           gatews.BaseUrl,
 			Key:           e.Config.ApiKey,
 			Secret:        e.Config.ApiSecretKey,
 			MaxRetryConn:  10, // default value is math.MaxInt64, set it when needs
