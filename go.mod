@@ -6,7 +6,7 @@ require (
 	github.com/antihax/optional v1.0.0
 	github.com/gateio/gateapi-go/v6 v6.104.3
 	github.com/gateio/gatews/go v0.0.0-20250523113507-90357b11b694
-	github.com/prtmon/finance v0.0.0-20250922084353-93abee8cefd4
+	github.com/prtmon/finance v0.0.0-20250928022307-781d0659d172
 	github.com/prtmon/tools v0.0.0-20250922081144-b42061079600
 )
 
