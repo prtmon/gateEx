@@ -11,29 +11,23 @@ import (
 	"strings"
 )
 
-// FuturesConfig 合约配置信息
-type FuturesConfig struct {
-	Settle   string `json:"settle"`   //现货为计价币种,合约为结算币种
-	Leverage int64  `json:"leverage"` //杠杆倍数,部分交易所支持小数位的倍数系数
-}
-
-type ExConfig struct {
-	Name          string         `json:"name"`           //交易所名称 name
-	ApiKey        string         `json:"api_key"`        //交易所api key
-	ApiSecretKey  string         `json:"api_secret_key"` //交易所secret key
-	ApiPassphrase string         `json:"api_passphrase"` //交易所API密码
-	ProxyUrl      string         `json:"proxy_url"`      //代理服务器地址
-	Futures       *FuturesConfig `json:"futures"`        //合约配置信息
+type Config struct {
+	Name          string `json:"name"`           //交易所名称 name
+	ApiKey        string `json:"api_key"`        //交易所api key
+	ApiSecretKey  string `json:"api_secret_key"` //交易所secret key
+	ApiPassphrase string `json:"api_passphrase"` //交易所API密码
+	ProxyUrl      string `json:"proxy_url"`      //代理服务器地址
+	Settle        string `json:"settle"`         //现货为计价币种,合约为结算币种
 }
 
 type Exchange struct {
-	Config    *ExConfig          `json:"config"` //exchange config
+	Config    *Config            `json:"config"` //exchange config
 	apiClient *gateapi.APIClient //api client
 	wsClient  *gatews.WsService  //websocket client
 	apiCtx    context.Context    //全局context
 }
 
-func NewExchange(conf *ExConfig) *Exchange {
+func NewExchange(conf *Config) *Exchange {
 	ex := &Exchange{
 		Config: conf,
 	}
@@ -46,6 +40,10 @@ func (e *Exchange) UID() string {
 		return ""
 	}
 	return tools.Int64ToString(accountDetail.UserId)
+}
+
+func (e *Exchange) Settle() string {
+	return strings.ToLower(e.Config.Settle)
 }
 
 func (e *Exchange) ApiClient() *gateapi.APIClient {
@@ -85,7 +83,7 @@ func (e *Exchange) ApiCtx() context.Context {
 func (e *Exchange) WsFuturesClient() *gatews.WsService {
 	if e.wsClient == nil {
 		wsUrl := gatews.FuturesUsdtUrl
-		if strings.ToUpper(e.Config.Futures.Settle) == "USD" || strings.ToUpper(e.Config.Futures.Settle) == "BTC" {
+		if strings.ToUpper(e.Settle()) == "USD" || strings.ToUpper(e.Settle()) == "BTC" {
 			wsUrl = gatews.FuturesBtcUrl
 		}
 		var err error
