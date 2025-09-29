@@ -31,20 +31,21 @@ type Exchange struct {
 	apiClient *gateapi.APIClient //api client
 	wsClient  *gatews.WsService  //websocket client
 	apiCtx    context.Context    //全局context
-	Uid       string             `json:"uid"` //用户ID
 }
 
 func NewExchange(conf *ExConfig) *Exchange {
 	ex := &Exchange{
 		Config: conf,
 	}
-
-	accountDetail, err := ex.GetAccountDetail()
-	if err != nil {
-		panic(err.Error())
-	}
-	ex.Uid = tools.Int64ToString(accountDetail.UserId)
 	return ex
+}
+
+func (e *Exchange) UID() string {
+	accountDetail, err := e.GetAccountDetail()
+	if err != nil {
+		return ""
+	}
+	return tools.Int64ToString(accountDetail.UserId)
 }
 
 func (e *Exchange) ApiClient() *gateapi.APIClient {

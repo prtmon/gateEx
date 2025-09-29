@@ -17,10 +17,6 @@ func (f FuturesCandlesticks) ToCandlesticks() common.Candlesticks {
 		candlesticks[i].Low = tools.ToFloat64(k.L)
 		candlesticks[i].Close = tools.ToFloat64(k.C)
 		candlesticks[i].Volume = tools.ToFloat64(k.V)
-		//candlesticks[i].RealBody = utils.Abs(candlesticks[i].Close - candlesticks[i].Open)
-		//candlesticks[i].UpperShadow = candlesticks[i].High - max(candlesticks[i].Close, candlesticks[i].Open)
-		//candlesticks[i].LowerShadow = min(candlesticks[i].Close, candlesticks[i].Open) - candlesticks[i].Low
-		//candlesticks[i].IsBullish = candlesticks[i].Close > candlesticks[i].Open
 	}
 	return candlesticks
 }
